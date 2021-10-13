@@ -6,6 +6,7 @@ actor User as user
 participant Auth_Service as authservice
 participant Prenotation_Service as prenotationservice
 participant Merchant_Service as merchantservice
+participant User_Service as userservice
 database Prenotation_DB as prenotationdb
 queue prenotation_queue as prenotationqueue
 
@@ -17,11 +18,29 @@ prenotationservice -> prenotationdb: Controlla la disponibilità
 activate prenotationdb
 prenotationdb --> prenotationservice: Disponibilità del locale
 deactivate prenotationdb
-prenotationservice -> prenotationqueue: PRENOTATION_PENDING
-... Un piccolo delay ...
-prenotationqueue --> merchantservice: PRENOTATION_PENDING
-activate merchantservice
-merchantservice -> merchantservice: Controlla la disponibilità
-merchantservice -> prenotationqueue: PRENOTATION_AVAILABLE
-deactivate merchantservice
+alt Se c'è disponibilità
+    prenotationservice -> prenotationqueue: PRENOTATION_PENDING
+    ... Un piccolo delay ...
+    prenotationqueue --> merchantservice: PRENOTATION_PENDING
+    activate merchantservice
+    merchantservice -> merchantservice: Controlla la disponibilità
+    merchantservice -> prenotationqueue: PRENOTATION_AVAILABLE
+    deactivate merchantservice
+    ... Un piccolo delay ...
+    prenotationqueue --> userservice: PRENOTATION_AVAILABLE
+    activate userservice
+    userservice -> userservice: Aggiorna lo stato dell'utente
+    userservice -> prenotationqueue: PRENOTATION_DONE
+    deactivate userservice
+    ... Un piccolo delay ...
+    prenotationqueue --> prenotationservice: PRENOTATION_DONE
+    prenotationservice -> prenotationservice: Conferma la prenotazione
+    prenotationservice -> authservice: Conferma prenotazione
+    deactivate prenotationservice
+    authservice -> user: Conferma la prenotazione
+else il locale non ha disponibilità
+    prenotationservice -> prenotationservice: Annulla la prenotazione
+    prenotationservice -> authservice: Annullamento prenotazione
+    authservice -> user: Prenotazione fallita
+end
 @enduml
