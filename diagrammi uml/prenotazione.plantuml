@@ -1,0 +1,27 @@
+@startuml Prenotazione
+
+hide footbox
+
+actor User as user
+participant Auth_Service as authservice
+participant Prenotation_Service as prenotationservice
+participant Merchant_Service as merchantservice
+database Prenotation_DB as prenotationdb
+queue prenotation_queue as prenotationqueue
+
+user -> authservice: Richiesta di prenotazione
+activate authservice
+authservice -> prenotationservice: Richiesta di prenotazione
+activate prenotationservice
+prenotationservice -> prenotationdb: Controlla la disponibilità
+activate prenotationdb
+prenotationdb --> prenotationservice: Disponibilità del locale
+deactivate prenotationdb
+prenotationservice -> prenotationqueue: PRENOTATION_PENDING
+... Un piccolo delay ...
+prenotationqueue --> merchantservice: PRENOTATION_PENDING
+activate merchantservice
+merchantservice -> merchantservice: Controlla la disponibilità
+merchantservice -> prenotationqueue: PRENOTATION_AVAILABLE
+deactivate merchantservice
+@enduml
