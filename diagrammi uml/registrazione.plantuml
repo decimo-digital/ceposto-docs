@@ -1,0 +1,19 @@
+@startuml Registrazione
+
+hide footbox
+actor user
+participant Auth_Service as authservice
+participant User_Service as userservice
+
+user -> authservice: Chiamata di registrazione
+authservice -> authservice: Prova a salvare le informazioni sul suo database
+alt Inserimento con successo
+    authservice -> userservice: Chiamata per creare l'utenza
+    userservice -> userservice: Salvataggio dei dati sul db
+    userservice -> authservice: OK
+    authservice -> user: OK
+else Inserimento fallito
+    authservice -x user : Registrazione fallita
+end
+
+@enduml
