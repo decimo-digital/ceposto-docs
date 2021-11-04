@@ -7,40 +7,19 @@ participant Auth_Service as authservice
 participant Prenotation_Service as prenotationservice
 participant Merchant_Service as merchantservice
 participant User_Service as userservice
-database Prenotation_DB as prenotationdb
-queue prenotation_queue as prenotationqueue
 
 user -> authservice: Richiesta di prenotazione
-activate authservice
 authservice -> prenotationservice: Richiesta di prenotazione
-activate prenotationservice
-prenotationservice -> prenotationdb: Controlla la disponibilità
-activate prenotationdb
-prenotationdb --> prenotationservice: Disponibilità del locale
-deactivate prenotationdb
-alt Se c'è disponibilità
-    prenotationservice -> prenotationqueue: PRENOTATION_PENDING
-    ... Un piccolo delay ...
-    prenotationqueue --> merchantservice: PRENOTATION_PENDING
-    activate merchantservice
-    merchantservice -> merchantservice: Controlla la disponibilità
-    merchantservice -> prenotationqueue: PRENOTATION_AVAILABLE
-    deactivate merchantservice
-    ... Un piccolo delay ...
-    prenotationqueue --> userservice: PRENOTATION_AVAILABLE
-    activate userservice
-    userservice -> userservice: Aggiorna lo stato dell'utente
-    userservice -> prenotationqueue: PRENOTATION_DONE
-    deactivate userservice
-    ... Un piccolo delay ...
-    prenotationqueue --> prenotationservice: PRENOTATION_DONE
-    prenotationservice -> prenotationservice: Conferma la prenotazione
-    prenotationservice -> authservice: Conferma prenotazione
-    deactivate prenotationservice
-    authservice -> user: Conferma la prenotazione
-else il locale non ha disponibilità
-    prenotationservice -> prenotationservice: Annulla la prenotazione
-    prenotationservice -> authservice: Annullamento prenotazione
-    authservice -> user: Prenotazione fallita
-end
+prenotationservice -> prenotationservice: Controlla se ci sono posti disponibili
+alt Se ci sono posti disponibili
+prenotationservice -> prenotationservice: Segna la prenotazione
+prenotationservice -> merchantservice: Aggiorna il dato ridondato
+prenotationservice -> userservice: Aggiunge la prenotazione attuale
+prenotationservice -> authservice: Prenotazione effettuata
+authservice -> user: Prenotazione effettuata
+else Se non ci sono posti disponibili
+prenotationservice -> authservice: Prenotazione impossibile
+authservice -x user: Prenotazione impossibile
+end 
+
 @enduml
