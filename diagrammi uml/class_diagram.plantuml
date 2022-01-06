@@ -1,0 +1,36 @@
+@startuml classDiagram
+
+class auth_user {
+    String first_name
+    String last_name
+    String password
+    String email
+}
+
+class merchant {
+    int id
+    String owner
+    String store_name
+    Point location
+    String cuisitneType
+    double distance
+    int totalSeats
+    int freeSeats
+    double occupancyRate
+}
+
+class prenotation {
+    int id
+    int owner
+    int merchant
+    int amount
+    DateTime date
+    bool isExpired
+    bool isValid
+    DateTime dateOfCreation
+}
+
+auth_user "1" -* "many" prenotation: Prenotatore
+prenotation "many" *- "1" merchant: Prenotazione
+merchant "1" <- "1" auth_user: Proprietario
+@enduml
