@@ -31,6 +31,30 @@ class Prenotation {
     DateTime dateOfCreation
 }
 
+class Menu{
+    int id
+    int merchantId
+    List<MenuItem> menuItems
+}
+
+class MenuItem{
+    int id
+    String name
+    double price
+    MenuSection section
+}
+
+enum MenuSection{
+    Primo
+    Secondo
+    Dolce
+    Contorno
+}
+
+Merchant "1" -> "1" Menu
+Menu "1" -> "many" MenuItem: Elemento del menu
+MenuItem "1" -> "1" MenuSection
+
 AuthUser "1" -> "many" Prenotation: Prenotatore
 Prenotation "many" <- "1" Merchant: Prenotazione
 Merchant "1" <- "1" AuthUser: Proprietario
