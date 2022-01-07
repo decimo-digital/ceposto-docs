@@ -1,25 +1,26 @@
 @startuml classDiagram
 
-class auth_user {
+class AuthUser {
     String first_name
     String last_name
     String password
     String email
+    String googleId
 }
 
-class merchant {
+class Merchant {
     int id
     String owner
     String store_name
     Point location
-    String cuisitneType
+    String cuisineType
     double distance
     int totalSeats
     int freeSeats
     double occupancyRate
 }
 
-class prenotation {
+class Prenotation {
     int id
     int owner
     int merchant
@@ -30,7 +31,7 @@ class prenotation {
     DateTime dateOfCreation
 }
 
-auth_user "1" -* "many" prenotation: Prenotatore
-prenotation "many" *- "1" merchant: Prenotazione
-merchant "1" <- "1" auth_user: Proprietario
+AuthUser "1" -> "many" Prenotation: Prenotatore
+Prenotation "many" <- "1" Merchant: Prenotazione
+Merchant "1" <- "1" AuthUser: Proprietario
 @enduml
