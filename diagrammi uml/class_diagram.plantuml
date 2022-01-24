@@ -6,6 +6,7 @@ class AuthUser {
     String password
     String email
     String googleId
+    boolean isMerchant
 }
 
 class Merchant {
@@ -55,7 +56,7 @@ Merchant "1" -> "1" Menu
 Menu "1" -> "many" MenuItem: Elemento del menu
 MenuItem "1" -> "1" MenuSection
 
-AuthUser "1" -> "many" Prenotation: Prenotatore
+AuthUser "1" -> "many" Prenotation
 Prenotation "many" <- "1" Merchant: Prenotazione
-Merchant "1" <- "1" AuthUser: Proprietario
+Merchant "many" <- "1" AuthUser: Proprietario
 @enduml
